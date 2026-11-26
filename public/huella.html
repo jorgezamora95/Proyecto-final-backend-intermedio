@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Huella de carbono - Sistema de Tickets</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header-verde">
+    <h1>🌱 Huella de carbono</h1>
+    <p>Impacto climático estimado del Sistema de Tickets</p>
+    <div class="sesion">
+      <a href="index.html" class="btn-volver">← Volver a tickets</a>
+    </div>
+  </header>
+
+  <div class="contenedor">
+
+    <!-- Datos del servidor -->
+    <div class="panel">
+      <div class="cabecera-panel">
+        <h2>🖥️ Servidor</h2>
+        <button class="btn-guardar" onclick="cargarHuella()">🔄 Actualizar</button>
+      </div>
+      <p class="nota">Desde que se encendió el servidor: <b id="inicio">-</b></p>
+
+      <div class="contadores">
+        <div class="contador verde"><span id="peticiones">0</span>Peticiones atendidas</div>
+        <div class="contador verde"><span id="bytes">0</span>Datos enviados</div>
+        <div class="contador verde"><span id="energia">0</span>Energía estimada</div>
+        <div class="contador verde"><span id="co2">0</span>CO₂ estimado</div>
+      </div>
+
+      <div class="sci">
+        <h3>SCI: CO₂ por petición</h3>
+        <span id="co2-peticion">0</span>
+        <code>SCI = ((E × I) + M) / R</code>
+        <p>E = energía · I = <span id="intensidad">494</span> gCO₂/kWh · R = 1 petición a la API</p>
+      </div>
+    </div>
+
+    <!-- Datos de esta página -->
+    <div class="panel">
+      <h2>🌐 Esta página en tu navegador</h2>
+      <p class="nota">Lo que descargó tu navegador para mostrar esta página (medido con la Performance API).</p>
+      <div class="contadores tres">
+        <div class="contador verde"><span id="pagina-archivos">0</span>Archivos descargados</div>
+        <div class="contador verde"><span id="pagina-bytes">0</span>Peso total</div>
+        <div class="contador verde"><span id="pagina-co2">0</span>CO₂ estimado</div>
+      </div>
+    </div>
+
+    <!-- Prácticas verdes -->
+    <div class="panel">
+      <h2>✅ Prácticas verdes aplicadas</h2>
+      <ul class="practicas">
+        <li><b>Pool de conexiones</b> a MySQL: reutiliza conexiones en lugar de abrir una por consulta.</li>
+        <li><b>Solo las columnas necesarias</b> en las consultas, en lugar de <code>SELECT *</code>.</li>
+        <li><b>Búsquedas por índice</b> (llave primaria y usuario <code>UNIQUE</code>).</li>
+        <li><b>Filtros en el navegador</b>: buscar y filtrar no hace peticiones al servidor.</li>
+        <li><b>Solo se actualiza el ticket que cambió</b>: al crear, editar o borrar no se vuelve a descargar toda la lista.</li>
+        <li><b>Caché del clima</b>: Open-Meteo se consulta como máximo cada 30 minutos y solo se pide el pronóstico de hoy.</li>
+        <li><b>Sin polling</b>: ni esta página se actualiza sola; solo pide datos cuando presionas "Actualizar".</li>
+        <li><b>Frontend ligero</b>: HTML, CSS y JavaScript sin frameworks. La única librería es Chart.js (unos 70 KB comprimida) y solo se carga en la página del clima; el navegador la guarda en caché un año.</li>
+        <li><b>Caché del navegador</b>: los archivos que no cambiaron no se vuelven a descargar (respuesta 304).</li>
+      </ul>
+    </div>
+
+    <!-- Explicación -->
+    <div class="panel">
+      <h2>📖 ¿Cómo se calcula?</h2>
+      <p>Se usa el modelo <b>Sustainable Web Design (v3)</b>, el mismo de la librería CO2.js de The Green Web Foundation:</p>
+      <ol>
+        <li>El servidor suma los bytes de cada respuesta que envía.</li>
+        <li><b>Energía</b> = GB transferidos × <span id="kwh-gb">0.81</span> kWh por GB (incluye servidores, red y dispositivos).</li>
+        <li><b>CO₂</b> = energía × <span id="intensidad2">494</span> gramos de CO₂ por kWh (promedio mundial de la electricidad).</li>
+      </ol>
+      <p class="aviso">⚠️ Es una <b>estimación</b> basada en los bytes transferidos, no una medición real de energía.
+        El valor real depende del hardware y de cómo se genera la electricidad donde corre el servidor.
+        Los contadores se reinician cada vez que se apaga el servidor.</p>
+    </div>
+
+  </div>
+
+  <script src="huella-pagina.js"></script>
+</body>
+</html>

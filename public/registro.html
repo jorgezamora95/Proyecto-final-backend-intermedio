@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - Sistema de Tickets</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="pagina-login">
+
+  <div class="panel caja-login">
+    <h1>🎫 Crear cuenta</h1>
+    <p>Regístrate para usar el sistema de tickets</p>
+
+    <form id="form-registro">
+      <label>Nombre completo
+        <input id="nombre" maxlength="100" autocomplete="name" autofocus>
+      </label>
+      <label>Usuario
+        <input id="usuario" maxlength="50" autocomplete="username">
+      </label>
+      <label>Contraseña
+        <input id="password" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres">
+      </label>
+      <label>Confirmar contraseña
+        <input id="confirmar" type="password" autocomplete="new-password">
+      </label>
+
+      <div id="error-login"></div>
+
+      <button type="submit" class="btn-guardar">Registrarme</button>
+    </form>
+
+    <p class="enlace">¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a></p>
+  </div>
+
+  <script src="registro.js"></script>
+</body>
+</html>

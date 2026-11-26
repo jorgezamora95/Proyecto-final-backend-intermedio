@@ -1,0 +1,5 @@
+node_modules/
+.env
+
+# Carpeta con archivos descartados
+trash/

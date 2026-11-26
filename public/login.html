@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar sesión - Sistema de Tickets</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="pagina-login">
+
+  <div class="panel caja-login">
+    <h1>🎫 Sistema de Tickets</h1>
+    <p>Inicia sesión para continuar</p>
+
+    <form id="form-login">
+      <label>Usuario
+        <input id="usuario" autocomplete="username" autofocus>
+      </label>
+      <label>Contraseña
+        <input id="password" type="password" autocomplete="current-password">
+      </label>
+
+      <div id="error-login"></div>
+
+      <button type="submit" class="btn-guardar">Entrar</button>
+    </form>
+
+    <p class="enlace">¿No tienes cuenta? <a href="registro.html">Regístrate aquí</a></p>
+  </div>
+
+  <script src="login.js"></script>
+</body>
+</html>

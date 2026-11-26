@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clima - Sistema de Tickets</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="pagina-clima">
+  <header class="header-clima">
+    <h1>🌤️ Clima</h1>
+    <p>Pronóstico con Open-Meteo</p>
+    <div class="sesion">
+      <a href="index.html" class="btn-volver">← Volver a tickets</a>
+    </div>
+  </header>
+
+  <div class="contenedor">
+
+    <!-- Elegir ubicación -->
+    <div class="panel">
+      <h2>📍 Ubicación</h2>
+      <div class="filtros selector-clima">
+        <select id="ciudad">
+          <option value="52.52,13.41">Berlín</option>
+          <option value="19.43,-99.13">CDMX</option>
+          <option value="20.67,-103.35">Guadalajara</option>
+          <option value="25.67,-100.31">Monterrey</option>
+          <option value="40.42,-3.70">Madrid</option>
+          <option value="otra">Otra (escribir coordenadas)</option>
+        </select>
+        <input id="latitud" type="number" step="0.01" placeholder="Latitud (ej. 19.43)" hidden>
+        <input id="longitud" type="number" step="0.01" placeholder="Longitud (ej. -99.13)" hidden>
+        <select id="comparar">
+          <option value="">Comparar con... (ninguna)</option>
+          <option value="52.52,13.41">Berlín</option>
+          <option value="19.43,-99.13">CDMX</option>
+          <option value="20.67,-103.35">Guadalajara</option>
+          <option value="25.67,-100.31">Monterrey</option>
+          <option value="40.42,-3.70">Madrid</option>
+        </select>
+        <button class="btn-guardar" onclick="buscarClima()">Ver clima</button>
+      </div>
+      <p class="nota" id="estado-clima"></p>
+    </div>
+
+    <!-- Clima actual y tarjetas -->
+    <div class="panel">
+      <div class="clima-encabezado">
+        <div class="clima-actual" id="clima-actual"></div>
+        <div class="clima-actual comparacion" id="clima-comparar" hidden></div>
+      </div>
+      <div class="contadores">
+        <div class="contador azul"><span id="minima">-</span>Mínima (24 h)</div>
+        <div class="contador rojo"><span id="maxima">-</span>Máxima (24 h)</div>
+        <div class="contador verde"><span id="promedio">-</span>Promedio (24 h)</div>
+        <div class="contador"><span id="zona" class="texto-chico">-</span>Zona horaria</div>
+      </div>
+    </div>
+
+    <!-- Pronóstico de 7 días -->
+    <div class="panel">
+      <h2>📅 Próximos 7 días</h2>
+      <div class="dias" id="dias"></div>
+    </div>
+
+    <!-- Gráfica -->
+    <div class="panel">
+      <h2>📈 Temperatura de las próximas 24 horas</h2>
+      <div class="caja-grafica">
+        <canvas id="grafica"></canvas>
+      </div>
+      <p class="nota" id="cache-clima"></p>
+    </div>
+
+  </div>
+
+  <!-- Chart.js desde CDN para dibujar la gráfica -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="clima-pagina.js"></script>
+</body>
+</html>

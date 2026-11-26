@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gráficas - Sistema de Tickets</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="header-graficas">
+    <h1>📊 Gráficas</h1>
+    <p>Estadísticas de los tickets (calculadas por MySQL)</p>
+    <div class="sesion">
+      <a href="index.html" class="btn-volver">← Volver a tickets</a>
+    </div>
+  </header>
+
+  <div class="contenedor">
+
+    <!-- Números principales -->
+    <div class="contadores">
+      <div class="contador"><span id="g-total">-</span>Tickets en total</div>
+      <div class="contador cerrado"><span id="g-resueltos">-</span>Resueltos</div>
+      <div class="contador abierto"><span id="g-sin-asignar">-</span>Sin asignar</div>
+      <div class="contador"><span id="g-horas">-</span>Tiempo promedio para resolver</div>
+    </div>
+
+    <!-- Estado: barra dividida (parte del total) -->
+    <div class="panel">
+      <div class="cabecera-panel">
+        <h2>Tickets por estado</h2>
+        <button class="btn-guardar" onclick="cargarEstadisticas()">🔄 Actualizar</button>
+      </div>
+      <div class="barra-estados" id="barra-estados"></div>
+      <div class="leyenda" id="leyenda-estados"></div>
+    </div>
+
+    <div class="rejilla-graficas">
+      <div class="panel">
+        <h2>Tickets por técnico</h2>
+        <p class="nota">Cuántos tiene cada técnico, separados por estado.</p>
+        <div class="caja-grafica-chica"><canvas id="g-tecnicos"></canvas></div>
+        <details><summary>Ver datos</summary><div id="t-tecnicos"></div></details>
+      </div>
+
+      <div class="panel">
+        <h2>Tickets creados por día</h2>
+        <p class="nota">Últimos 14 días.</p>
+        <div class="caja-grafica-chica"><canvas id="g-dias"></canvas></div>
+        <details><summary>Ver datos</summary><div id="t-dias"></div></details>
+      </div>
+
+      <div class="panel">
+        <h2>Tickets por prioridad</h2>
+        <p class="nota">Todos los tickets, sin importar su estado.</p>
+        <div class="caja-grafica-chica"><canvas id="g-prioridad"></canvas></div>
+        <details><summary>Ver datos</summary><div id="t-prioridad"></div></details>
+      </div>
+
+      <div class="panel">
+        <h2>Tiempo promedio para resolver</h2>
+        <p class="nota">Horas desde que se crea el ticket hasta que se resuelve, por técnico.</p>
+        <div class="caja-grafica-chica"><canvas id="g-tiempo"></canvas></div>
+        <details><summary>Ver datos</summary><div id="t-tiempo"></div></details>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Chart.js desde CDN (el navegador ya lo tiene en caché si abriste la página del clima) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="graficas.js"></script>
+</body>
+</html>

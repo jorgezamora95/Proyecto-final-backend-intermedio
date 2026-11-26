@@ -1,0 +1,938 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Sistema de Tickets",
+    "version": "1.0.0",
+    "description": "Proyecto final de Backend Intermedio. CRUD de tickets de soporte con Node.js, Express y MySQL. Para usar las rutas de tickets primero hay que iniciar sesión con POST /api/login (usuario: admin, contraseña: admin123)."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Login",
+      "description": "Iniciar y cerrar sesión"
+    },
+    {
+      "name": "Tickets",
+      "description": "Operaciones CRUD de tickets"
+    },
+    {
+      "name": "Huella de carbono",
+      "description": "Estimación del impacto climático del servidor"
+    },
+    {
+      "name": "Clima",
+      "description": "Clima actual y pronóstico del día usando la API de Open-Meteo"
+    }
+  ],
+  "paths": {
+    "/api/login": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "summary": "Iniciar sesión",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "usuario",
+                  "password"
+                ],
+                "properties": {
+                  "usuario": {
+                    "type": "string",
+                    "example": "admin"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "admin123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Sesión iniciada",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "Bienvenido Administrador",
+                  "usuario": {
+                    "id": 1,
+                    "nombre": "Administrador",
+                    "usuario": "admin"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Faltan datos",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "Usuario y contraseña son obligatorios"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Datos incorrectos",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "Usuario o contraseña incorrectos"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/registro": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "summary": "Registrar un usuario nuevo (inicia sesión automáticamente)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "nombre",
+                  "usuario",
+                  "password"
+                ],
+                "properties": {
+                  "nombre": {
+                    "type": "string",
+                    "example": "Juan Pérez"
+                  },
+                  "usuario": {
+                    "type": "string",
+                    "example": "juan"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "juan123",
+                    "description": "Mínimo 6 caracteres"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario registrado",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "Usuario registrado",
+                  "usuario": {
+                    "id": 2,
+                    "nombre": "Juan Pérez",
+                    "usuario": "juan"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos inválidos o usuario repetido",
+            "content": {
+              "application/json": {
+                "example": {
+                  "errores": [
+                    "Ese usuario ya está registrado"
+                  ]
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/ErrorServidor"
+          }
+        }
+      }
+    },
+    "/api/logout": {
+      "post": {
+        "tags": [
+          "Login"
+        ],
+        "summary": "Cerrar sesión",
+        "responses": {
+          "200": {
+            "description": "Sesión cerrada",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "Sesión cerrada"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "tags": [
+          "Login"
+        ],
+        "summary": "Ver el usuario con sesión iniciada",
+        "responses": {
+          "200": {
+            "description": "Usuario actual",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": 1,
+                  "nombre": "Administrador",
+                  "usuario": "admin"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No hay sesión",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "No has iniciado sesión"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuarios": {
+      "get": {
+        "tags": [
+          "Login"
+        ],
+        "summary": "Lista de usuarios para asignar tickets (solo id y nombre)",
+        "responses": {
+          "200": {
+            "description": "Usuarios",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "id": 1,
+                    "nombre": "Administrador"
+                  },
+                  {
+                    "id": 3,
+                    "nombre": "Luis Técnico"
+                  }
+                ]
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/SinSesion"
+          }
+        }
+      }
+    },
+    "/api/tickets": {
+      "get": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Obtener todos los tickets",
+        "responses": {
+          "200": {
+            "description": "Lista de tickets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Ticket"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/SinSesion"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErrorServidor"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Crear un ticket nuevo",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketNuevo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ticket creado",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "Ticket creado",
+                  "id": 4
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/DatosInvalidos"
+          },
+          "401": {
+            "$ref": "#/components/responses/SinSesion"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErrorServidor"
+          }
+        }
+      }
+    },
+    "/api/tickets/estadisticas": {
+      "get": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Estadísticas para la página de gráficas (calculadas con GROUP BY)",
+        "responses": {
+          "200": {
+            "description": "Conteos y promedios",
+            "content": {
+              "application/json": {
+                "example": {
+                  "porEstado": [
+                    {
+                      "estado": "abierto",
+                      "total": 6
+                    },
+                    {
+                      "estado": "en_progreso",
+                      "total": 5
+                    },
+                    {
+                      "estado": "cerrado",
+                      "total": 12
+                    }
+                  ],
+                  "porPrioridad": [
+                    {
+                      "prioridad": "alta",
+                      "total": 7
+                    },
+                    {
+                      "prioridad": "media",
+                      "total": 9
+                    },
+                    {
+                      "prioridad": "baja",
+                      "total": 7
+                    }
+                  ],
+                  "porTecnico": [
+                    {
+                      "tecnico": "Luis Técnico",
+                      "abierto": "1",
+                      "en_progreso": "0",
+                      "cerrado": "4"
+                    }
+                  ],
+                  "porDia": [
+                    {
+                      "dia": "2026-11-25",
+                      "total": 2
+                    }
+                  ],
+                  "resolucion": [
+                    {
+                      "tecnico": "Luis Técnico",
+                      "resueltos": 4,
+                      "horas_promedio": "24.3"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/SinSesion"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErrorServidor"
+          }
+        }
+      }
+    },
+    "/api/tickets/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Id del ticket",
+          "schema": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Obtener un ticket por su id",
+        "responses": {
+          "200": {
+            "description": "El ticket encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ticket"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/SinSesion"
+          },
+          "404": {
+            "$ref": "#/components/responses/NoEncontrado"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErrorServidor"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Actualizar un ticket",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TicketEditar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ticket actualizado",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "Ticket actualizado"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/DatosInvalidos"
+          },
+          "401": {
+            "$ref": "#/components/responses/SinSesion"
+          },
+          "404": {
+            "$ref": "#/components/responses/NoEncontrado"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErrorServidor"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Eliminar un ticket",
+        "responses": {
+          "200": {
+            "description": "Ticket eliminado",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "Ticket eliminado"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/SinSesion"
+          },
+          "404": {
+            "$ref": "#/components/responses/NoEncontrado"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErrorServidor"
+          }
+        }
+      }
+    },
+    "/api/tickets/{id}/resolver": {
+      "put": {
+        "tags": [
+          "Tickets"
+        ],
+        "summary": "Resolver un ticket: guarda la solución y lo cierra",
+        "description": "Quién lo resolvió se toma de la sesión y la fecha con NOW().",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "solucion"
+                ],
+                "properties": {
+                  "solucion": {
+                    "type": "string",
+                    "minLength": 5,
+                    "example": "Se cambió el tóner y ya imprime"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ticket resuelto",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "Ticket resuelto",
+                  "resuelto_por_nombre": "Luis Técnico"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Falta la solución",
+            "content": {
+              "application/json": {
+                "example": {
+                  "errores": [
+                    "Describe la solución (mínimo 5 caracteres)"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/SinSesion"
+          },
+          "404": {
+            "$ref": "#/components/responses/NoEncontrado"
+          },
+          "500": {
+            "$ref": "#/components/responses/ErrorServidor"
+          }
+        }
+      }
+    },
+    "/api/huella": {
+      "get": {
+        "tags": [
+          "Huella de carbono"
+        ],
+        "summary": "Peticiones, bytes enviados y CO2 estimado desde que se encendió el servidor (modelo Sustainable Web Design v3)",
+        "responses": {
+          "200": {
+            "description": "Datos de la huella de carbono",
+            "content": {
+              "application/json": {
+                "example": {
+                  "inicio": "2026-11-24T23:56:55.580Z",
+                  "peticiones": 9,
+                  "bytesEnviados": 24773,
+                  "energiaKWh": 0.0000200661,
+                  "co2Gramos": 0.0099127,
+                  "co2PorPeticion": 0.0011014,
+                  "memoriaMB": 67.9,
+                  "modelo": {
+                    "nombre": "Sustainable Web Design v3",
+                    "kwhPorGB": 0.81,
+                    "gramosCO2PorKWh": 494
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/SinSesion"
+          }
+        }
+      }
+    },
+    "/api/clima": {
+      "get": {
+        "tags": [
+          "Clima"
+        ],
+        "summary": "Clima actual, próximas 24 horas y pronóstico de 7 días (caché de 30 minutos por ubicación)",
+        "description": "Sin parámetros usa la ciudad configurada en el .env.",
+        "parameters": [
+          {
+            "name": "lat",
+            "in": "query",
+            "required": false,
+            "description": "Latitud (-90 a 90)",
+            "schema": {
+              "type": "number",
+              "example": 19.43
+            }
+          },
+          {
+            "name": "lon",
+            "in": "query",
+            "required": false,
+            "description": "Longitud (-180 a 180)",
+            "schema": {
+              "type": "number",
+              "example": -99.13
+            }
+          },
+          {
+            "name": "ciudad",
+            "in": "query",
+            "required": false,
+            "description": "Nombre que se muestra",
+            "schema": {
+              "type": "string",
+              "example": "CDMX"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Datos del clima",
+            "content": {
+              "application/json": {
+                "example": {
+                  "latitud": 52.52,
+                  "longitud": 13.41,
+                  "ciudad": "Berlín",
+                  "temperatura": 0.5,
+                  "texto": "Parcialmente nublado",
+                  "icono": "⛅",
+                  "minima": -0.3,
+                  "maxima": 1.9,
+                  "promedio": 1,
+                  "zonaHoraria": "Europe/Berlin",
+                  "horas": [
+                    {
+                      "hora": "15:00",
+                      "temperatura": 19.8
+                    },
+                    {
+                      "hora": "16:00",
+                      "temperatura": 19.5
+                    }
+                  ],
+                  "actualizado": "2026-11-25T18:00:00.000Z",
+                  "desdeCache": true,
+                  "llamadasApi": 1,
+                  "respuestasCache": 3,
+                  "tipo": "nublado",
+                  "esDeDia": true,
+                  "dias": [
+                    {
+                      "fecha": "2026-11-25",
+                      "maxima": 19.8,
+                      "minima": 11.3,
+                      "texto": "Lluvia",
+                      "icono": "🌧️",
+                      "tipo": "lluvia"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Coordenadas inválidas",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "Latitud debe estar entre -90 y 90 y longitud entre -180 y 180"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/SinSesion"
+          },
+          "502": {
+            "description": "Open-Meteo no respondió",
+            "content": {
+              "application/json": {
+                "example": {
+                  "mensaje": "No se pudo obtener el clima"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Ticket": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "titulo": {
+            "type": "string",
+            "example": "No funciona la impresora"
+          },
+          "descripcion": {
+            "type": "string",
+            "example": "La impresora del segundo piso no imprime"
+          },
+          "solicitante": {
+            "type": "string",
+            "example": "Juan"
+          },
+          "email": {
+            "type": "string",
+            "example": "juan@empresa.com"
+          },
+          "prioridad": {
+            "type": "string",
+            "enum": [
+              "baja",
+              "media",
+              "alta"
+            ],
+            "example": "alta"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "abierto",
+              "en_progreso",
+              "cerrado"
+            ],
+            "example": "abierto"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "asignado_a": {
+            "type": "integer",
+            "nullable": true,
+            "example": 3,
+            "description": "id del técnico (usuario) asignado; null = sin asignar"
+          },
+          "asignado_nombre": {
+            "type": "string",
+            "nullable": true,
+            "example": "Luis Técnico"
+          },
+          "solucion": {
+            "type": "string",
+            "nullable": true,
+            "example": "Se cambió el tóner y ya imprime"
+          },
+          "resuelto_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "resuelto_por_nombre": {
+            "type": "string",
+            "nullable": true,
+            "example": "Luis Técnico"
+          }
+        }
+      },
+      "TicketNuevo": {
+        "type": "object",
+        "required": [
+          "titulo",
+          "descripcion",
+          "solicitante",
+          "email"
+        ],
+        "properties": {
+          "titulo": {
+            "type": "string",
+            "example": "No funciona la impresora"
+          },
+          "descripcion": {
+            "type": "string",
+            "example": "La impresora del segundo piso no imprime"
+          },
+          "solicitante": {
+            "type": "string",
+            "example": "Juan"
+          },
+          "email": {
+            "type": "string",
+            "example": "juan@empresa.com"
+          },
+          "prioridad": {
+            "type": "string",
+            "enum": [
+              "baja",
+              "media",
+              "alta"
+            ],
+            "example": "alta"
+          },
+          "asignado_a": {
+            "type": "integer",
+            "nullable": true,
+            "example": 3,
+            "description": "id del técnico (usuario) asignado; null = sin asignar"
+          }
+        }
+      },
+      "TicketEditar": {
+        "type": "object",
+        "required": [
+          "titulo",
+          "descripcion",
+          "solicitante",
+          "email"
+        ],
+        "properties": {
+          "titulo": {
+            "type": "string",
+            "example": "No funciona la impresora"
+          },
+          "descripcion": {
+            "type": "string",
+            "example": "Ya se cambió el tóner"
+          },
+          "solicitante": {
+            "type": "string",
+            "example": "Juan"
+          },
+          "email": {
+            "type": "string",
+            "example": "juan@empresa.com"
+          },
+          "prioridad": {
+            "type": "string",
+            "enum": [
+              "baja",
+              "media",
+              "alta"
+            ],
+            "example": "media"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "abierto",
+              "en_progreso",
+              "cerrado"
+            ],
+            "example": "en_progreso"
+          },
+          "asignado_a": {
+            "type": "integer",
+            "nullable": true,
+            "example": 3,
+            "description": "id del técnico (usuario) asignado; null = sin asignar"
+          }
+        },
+        "description": "Para cerrar un ticket usa /api/tickets/{id}/resolver. Si estado es \"abierto\" o \"en_progreso\" se borra la solución."
+      }
+    },
+    "responses": {
+      "DatosInvalidos": {
+        "description": "Faltan datos o están mal",
+        "content": {
+          "application/json": {
+            "example": {
+              "errores": [
+                "El título es obligatorio",
+                "El email no es válido"
+              ]
+            }
+          }
+        }
+      },
+      "NoEncontrado": {
+        "description": "El ticket no existe",
+        "content": {
+          "application/json": {
+            "example": {
+              "mensaje": "Ticket no encontrado"
+            }
+          }
+        }
+      },
+      "ErrorServidor": {
+        "description": "Error del servidor o de la base de datos",
+        "content": {
+          "application/json": {
+            "example": {
+              "mensaje": "Error al obtener los tickets"
+            }
+          }
+        }
+      },
+      "SinSesion": {
+        "description": "No has iniciado sesión",
+        "content": {
+          "application/json": {
+            "example": {
+              "mensaje": "Debes iniciar sesión"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Tickets</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Sistema de Tickets</h1>
+    <p>Mesa de ayuda - Proyecto final Backend</p>
+    <div class="sesion">
+      <a href="graficas.html" class="btn-huella btn-graficas">📊 Gráficas</a>
+      <a href="clima.html" class="btn-huella btn-clima">🌤️ Clima</a>
+      <a href="huella.html" class="btn-huella">🌱 Huella de carbono</a>
+      👤 <span id="nombre-usuario"></span>
+      <button class="btn-salir" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <div class="contenedor">
+
+    <!-- Clima (Open-Meteo) -->
+    <div class="panel panel-clima" id="clima">
+      <p class="nota">Cargando el clima...</p>
+    </div>
+
+    <!-- Contadores -->
+    <div class="contadores">
+      <div class="contador"><span id="total">0</span>Total</div>
+      <div class="contador abierto"><span id="total-abierto">0</span>Abiertos</div>
+      <div class="contador en_progreso"><span id="total-en_progreso">0</span>En progreso</div>
+      <div class="contador cerrado"><span id="total-cerrado">0</span>Cerrados</div>
+    </div>
+
+    <!-- Lista de tickets -->
+    <div class="panel">
+      <div class="cabecera-panel">
+        <h2>Tickets</h2>
+        <button class="btn-nuevo" onclick="abrirNuevo()">➕ Nuevo ticket</button>
+      </div>
+      <div class="filtros">
+          <input id="buscar" placeholder="🔍 Buscar por título o solicitante...">
+          <select id="filtro-estado">
+            <option value="">Todos los estados</option>
+            <option value="abierto">Abierto</option>
+            <option value="en_progreso">En progreso</option>
+            <option value="cerrado">Cerrado</option>
+          </select>
+          <select id="filtro-prioridad">
+            <option value="">Todas las prioridades</option>
+            <option value="alta">Alta</option>
+            <option value="media">Media</option>
+            <option value="baja">Baja</option>
+          </select>
+          <select id="filtro-asignado">
+            <option value="">Todos los técnicos</option>
+            <option value="mios">🔧 Mis tickets</option>
+            <option value="sin">Sin asignar</option>
+          </select>
+      </div>
+      <div id="lista"></div>
+    </div>
+  </div>
+
+  <!-- Ventana para CREAR un ticket o EDITAR / ASIGNAR uno que ya existe -->
+  <dialog id="dialogo-ticket">
+    <h2 id="titulo-form">➕ Nuevo ticket</h2>
+    <form id="formulario">
+      <input type="hidden" id="id">
+
+      <label>Título
+        <input id="titulo" maxlength="150" placeholder="Ej. No funciona la impresora">
+      </label>
+      <label>Descripción
+        <textarea id="descripcion" placeholder="Describe el problema..."></textarea>
+      </label>
+      <div class="fila-doble">
+        <label>Solicitante
+          <input id="solicitante" maxlength="100" placeholder="Tu nombre">
+        </label>
+        <label>Email
+          <input id="email" type="email" placeholder="correo@empresa.com">
+        </label>
+      </div>
+
+      <fieldset class="seccion-asignar">
+        <legend>🔧 Asignación</legend>
+        <div class="fila-doble">
+          <label>Asignado a
+            <select id="asignado">
+              <option value="">Sin asignar</option>
+            </select>
+          </label>
+          <label>Prioridad
+            <select id="prioridad">
+              <option value="baja">Baja</option>
+              <option value="media" selected>Media</option>
+              <option value="alta">Alta</option>
+            </select>
+          </label>
+        </div>
+        <label id="campo-estado">Estado
+          <select id="estado">
+            <option value="abierto">Abierto</option>
+            <option value="en_progreso">En progreso</option>
+            <option value="cerrado">Cerrado</option>
+          </select>
+        </label>
+      </fieldset>
+
+      <p class="error-ventana" id="error-ticket"></p>
+      <button type="submit" class="btn-guardar" id="btn-guardar">Crear ticket</button>
+      <button type="button" class="btn-cancelar" onclick="cerrarFormulario()">Cancelar</button>
+    </form>
+  </dialog>
+
+  <!-- Ventana para escribir la solución al resolver un ticket -->
+  <dialog id="dialogo-resolver">
+    <form id="form-resolver">
+      <h2>✔️ Resolver ticket</h2>
+      <p class="nota" id="resolver-titulo"></p>
+      <input type="hidden" id="resolver-id">
+      <label>¿Qué se hizo para resolverlo?
+        <textarea id="solucion" placeholder="Ej. Se cambió el cable de corriente y el equipo ya enciende."></textarea>
+      </label>
+      <p class="error-ventana" id="error-resolver"></p>
+      <button type="submit" class="btn-guardar">Cerrar ticket</button>
+      <button type="button" class="btn-cancelar" onclick="cerrarDialogo()">Cancelar</button>
+    </form>
+  </dialog>
+
+  <div id="mensaje"></div>
+
+  <script src="clima.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
